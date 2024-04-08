@@ -9,16 +9,14 @@ import Foundation
 
 
 enum Keys {
-    
     static let gameSettings: String = "settings"
-    static let settingsForTableView: String = "settingsForTableView"
-    
+    static let photo: String = "images"
 }
 
 enum GameLevel: Int {
-case easy
-case medium
-case hard
+    case easy
+    case medium
+    case hard
     
     func getSpeed() -> Double {
         switch self {

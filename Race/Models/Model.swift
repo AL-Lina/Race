@@ -16,8 +16,6 @@ class Settings: Codable {
     var gameLevel: Int = 0
     var gameSpeed: Double = 1.6
     var date: String = ""
-//    var time: String = ""
-    
 }
 
 

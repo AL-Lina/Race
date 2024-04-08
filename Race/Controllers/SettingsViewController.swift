@@ -63,7 +63,6 @@ class SettingsViewController: UIViewController {
         return textfield
     }()
     
-    
     let stackForRightAndLeftButtons: UIStackView = {
         let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -74,14 +73,9 @@ class SettingsViewController: UIViewController {
         return stackView
     }()
     
-    
     var currentIndex = 0
     
-    
-    
     let arrayOfCars = [UIImage(named: "1"), UIImage(named: "2"), UIImage(named: "3"), UIImage(named: "4"), UIImage(named: "5")]
-    
-    let array: [String] = ["1", "2", "3", "4", "5"]
     
     let imageView: UIImageView = {
         let imageView = UIImageView()
@@ -116,6 +110,7 @@ class SettingsViewController: UIViewController {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.layer.cornerRadius = 75
         imageView.clipsToBounds = true
+        imageView.image = UIImage(named: "space")
         return imageView
     }()
     
@@ -131,21 +126,20 @@ class SettingsViewController: UIViewController {
         return segmentedControl
     }()
     
-   
-    let image = UIImage(named: "space")
-    
     override func viewWillAppear(_ animated: Bool) {
         leftButton.animateButton()
         rightButton.animateButton()
         load()
+        loadImage()
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view.adGradientBackgroundColor(firstColor: .black, secondColor: .purple)
+        
         addTapGestureToHideKeyboard()
-       
+        
         setUpScreen()
         
         createTapGester()
@@ -153,9 +147,6 @@ class SettingsViewController: UIViewController {
         self.hideNavigationBar()
         
         nameTextField.delegate = self
-        
-        avatarImage.image = image
-       
     }
     
     func setUpScreen() {
@@ -172,10 +163,7 @@ class SettingsViewController: UIViewController {
         view.addSubview(gameSpeedSegmentedControl)
         
         backButton.addTarget(self, action: #selector(goBack), for: .primaryActionTriggered)
-        
         imageView.image = arrayOfCars[currentIndex]
-
-       
         
         NSLayoutConstraint.activate([
             backButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 5),
@@ -252,10 +240,11 @@ class SettingsViewController: UIViewController {
     }
     
     func load() {
-         var loaded = UserDefaults.standard.object(Settings.self, forKey: Keys.gameSettings)
+        var loaded = UserDefaults.standard.object(Settings.self, forKey: Keys.gameSettings)
         if loaded == nil {
             loaded = Settings()
         }
+        
         if let currentIndex = loaded?.imageCar {
             self.currentIndex = currentIndex
             imageView.image = arrayOfCars[currentIndex]
@@ -263,11 +252,6 @@ class SettingsViewController: UIViewController {
         
         if let text = loaded?.nameOfPlayer {
             nameTextField.text = text
-        }
-        
-        if let nameImage = loaded?.avatarImage {
-            let image = DataManager.shared.loadImage(fileName: nameImage)
-            avatarImage.image = image
         }
         
         if let selectedIndex = loaded?.gameLevel {
@@ -279,43 +263,38 @@ class SettingsViewController: UIViewController {
                 var newSpeedGame = selectedIndexX.getSpeed()
                 newSpeedGame = selectedIndex
             }
-            
         }
     }
     
+    func loadImage() {
+        guard let fileName = UserDefaults.standard.object(forKey: Keys.photo) as? String,
+              let avatar = DataManager.shared.loadImage(fileName: fileName) else { return }
+        print(fileName)
+        avatarImage.image = avatar
+    }
     
-   
+    func saveAvatarImage(image: UIImage) {
+        let imageName = DataManager.shared.saveImage(image)
+        UserDefaults.standard.set(imageName, forKey: Keys.photo)
+    }
     
     func saveUserDefaults() {
         
         var settings = UserDefaults.standard.object(Settings.self, forKey: Keys.gameSettings)
-       if settings == nil {
-           settings = Settings()
-       }
-        
-        
-        
+        if settings == nil {
+            settings = Settings()
+        }
         settings?.imageCar = currentIndex
         
         if let name = nameTextField.text {
             settings?.nameOfPlayer = name
-            
         }
-        
-        if let avatarImage = DataManager.shared.saveImage(avatarImage.image) {
-            settings?.avatarImage = avatarImage
-            
-        }
-        
         
         if let selectedIndex = GameLevel(rawValue: gameSpeedSegmentedControl.selectedSegmentIndex) {
             settings?.gameLevel = selectedIndex.rawValue
             settings?.gameSpeed = selectedIndex.getSpeed()
         }
-        
-        
         UserDefaults.standard.set(encodable: settings, forKey: Keys.gameSettings)
-       
     }
     
     
@@ -324,7 +303,7 @@ class SettingsViewController: UIViewController {
         navigationController?.popViewController(animated: true)
     }
     
-
+    
     @objc func listLeft() {
         currentIndex -= 1
         if currentIndex >= 0 {
@@ -346,7 +325,7 @@ class SettingsViewController: UIViewController {
         }
     }
     
-    }
+}
 
 
 extension SettingsViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
@@ -361,8 +340,8 @@ extension SettingsViewController: UIImagePickerControllerDelegate, UINavigationC
         if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             chosenImage = image
         }
-        
         avatarImage.image = chosenImage
+        saveAvatarImage(image: chosenImage)
         picker.dismiss(animated: true)
     }
 }

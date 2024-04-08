@@ -9,8 +9,6 @@ import UIKit
 
 class GameViewController: UIViewController {
     
-    
-    
     let stopWatchLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -28,38 +26,33 @@ class GameViewController: UIViewController {
     
     let obstacleImageView = UIImageView(image: UIImage(named: "obstacle"))
     let carImageView = UIImageView(image: UIImage(named: "1"))
+    
     var arrayOfObstacle: [UIImageView] = []
+    
     var blur = UIBlurEffect()
     var blurEffect = UIVisualEffectView()
     
     
     var timerForStopwatch: Timer = Timer()
     var count: Int = 0
-    var timerCounting: Bool = false
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-
         let timer = Timer.scheduledTimer(timeInterval: 1.4, target: self, selector: #selector(spawnFallingObjects), userInfo: nil, repeats: true)
         
         let secondTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(intersects), userInfo: nil, repeats: true)
         
-
         timerForStopwatch = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(timerCounter), userInfo: nil, repeats: true)
-        
         
         addPanGesture()
         objectData()
-        
     }
     
-    
-    
     func setUpScreen() {
+        
         view.addSubview(stopWatchLabel)
-        
-        
         self.hideNavigationBar()
         
         NSLayoutConstraint.activate([
@@ -78,7 +71,6 @@ class GameViewController: UIViewController {
         let time = secondsToHoursMinutesSeconds(seconds: count)
         let timeString = makeTimeString(hours: time.0, minutes: time.1, seconds: time.2)
         stopWatchLabel.text = timeString
-        
     }
     
     func createBlurEffect() {
@@ -121,7 +113,6 @@ class GameViewController: UIViewController {
     
     
     func createCar() {
-        
         view.addSubview(carImageView)
         carImageView.frame = CGRect(x: Int(view.center.x), y: Int (view.frame.size.height - 200), width: 100, height: 140)
     }
@@ -143,29 +134,11 @@ class GameViewController: UIViewController {
         gesture.setTranslation(CGPoint.zero, in: self.view)
     }
     
-//    func saveDate(settingsS: Settings) {
-//        var settings = UserDefaults.standard.object([SettingsForTableView].self, forKey: Keys.settingsForTableView)
-//       if settings == nil {
-//           settings = [SettingsForTableView]()
-//       }
-//        
-//
-//        
-//        
-//        
-//        let record = SettingsForTableView(nameOfPlayer: settingsS.nameOfPlayer, avatarImage: settingsS.avatarImage, gameResult: 0.0, date: date)
-//        settings?.append(record)
-//
-//        UserDefaults.standard.set(encodable: [settings], forKey: Keys.settingsForTableView)
-//    }
-    
-    
     func objectData() {
-        
         let currentDate = Date()
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "dd.MM.yy"
-                let date = dateFormatter.string(from: currentDate)
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd.MM.yy"
+        let date = dateFormatter.string(from: currentDate)
         
         if let gameSettings = UserDefaults.standard.object(Settings.self, forKey: Keys.gameSettings) {
             carImageView.image = arrayOfCars[gameSettings.imageCar]
@@ -174,15 +147,12 @@ class GameViewController: UIViewController {
         }
     }
     
-    
-    
     func createBackgroundRoad(withDuration: Double) {
         firstBackgroundImageView.frame = CGRect(x: self.view.frame.origin.x,
                                                 y: self.view.frame.origin.y,
                                                 width: self.view.frame.size.width,
                                                 height: self.view.frame.size.height)
         view.addSubview(firstBackgroundImageView)
-        
         
         secondBackgroundImageView.frame = CGRect(x: self.view.frame.origin.x,
                                                  y: -firstBackgroundImageView.frame.size.height,
@@ -201,17 +171,14 @@ class GameViewController: UIViewController {
     
     
     func createObstacle() {
-        
-        let firstlent = view.frame.minX - 80
-        let firty = view.frame.minY - 120
+        let coordinateX = view.frame.minX - 80
+        let coordinateY = view.frame.minY - 120
         
         obstacleImageView.frame.size = CGSize(width: 80, height: 120)
-        obstacleImageView.frame.origin = CGPoint(x: firstlent, y: firty)
+        obstacleImageView.frame.origin = CGPoint(x: coordinateX, y: coordinateY)
         view.addSubview(obstacleImageView)
         arrayOfObstacle.append(obstacleImageView)
     }
-    
-
     
     @objc func intersects() {
         for view in arrayOfObstacle {
@@ -230,7 +197,6 @@ class GameViewController: UIViewController {
     }
     
     func showAlert(title: String, message: String) {
-       
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let tryAction = UIAlertAction(title: "TRY AGAIN", style: .default) { _ in
             self.count = 0
@@ -245,7 +211,6 @@ class GameViewController: UIViewController {
             self.objectData()
         }
         
-
         UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseIn) {
             self.view.frame.origin.x = 0
             self.blurEffect.isHidden = false }
@@ -255,18 +220,16 @@ class GameViewController: UIViewController {
     }
     
     
-
     @objc func spawnFallingObjects() {
-        
-        let firstLenth = view.frame.minX
-        let secondLenth = view.frame.maxX - 90
+        let firstLength = view.frame.minX
+        let secondLength = view.frame.maxX - 90
         let startedY = view.frame.minY - 200
         
-        let randomXPosition = Int.random(in: Int(firstLenth)...Int(secondLenth))
-                    obstacleImageView.frame.origin = CGPoint(x: randomXPosition, y: Int(startedY))
+        let randomXPosition = Int.random(in: Int(firstLength)...Int(secondLength))
+        obstacleImageView.frame.origin = CGPoint(x: randomXPosition, y: Int(startedY))
         
-            UIView.animate(withDuration: 1.6) {
-                self.obstacleImageView.frame.origin.y = CGFloat(self.view.frame.maxY)
-            }
+        UIView.animate(withDuration: 1.6) {
+            self.obstacleImageView.frame.origin.y = CGFloat(self.view.frame.maxY)
+        }
     }
 }
